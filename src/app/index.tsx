@@ -1,63 +1,70 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { init, i, InstaQLEntity } from '@instantdb/react-native';
+import { View, Text, Button, StyleSheet } from 'react-native';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+// ID for app: jchat
+const APP_ID = 'c070abbe-96d4-4352-9bf2-b84957f9b948';
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
+// Optional: You can declare a schema!
+const schema = i.schema({
+  entities: {
+    colors: i.entity({
+      value: i.string(),
+    }),
+  },
+});
+
+type Color = InstaQLEntity<typeof schema, 'colors'>;
+
+const db = init({ appId: APP_ID, schema });
+
+const selectId = '4d39508b-9ee2-48a3-b70d-8192d9c5a059';
+
+function App() {
+  const { isLoading, error, data } = db.useQuery({
+    colors: {
+      $: { where: { id: selectId } },
+    },
+  });
+  if (isLoading) {
     return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
+      <View>
+        <Text>Loading...</Text>
+      </View>
     );
   }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
+  if (error) {
+    return (
+      <View>
+        <Text>Error: {error.message}</Text>
+      </View>
+    );
+  }
+
+  return <Main color={data.colors[0]} />;
 }
 
-export default function HomeScreen() {
+function Main(props: { color?: Color }) {
+  const { value } = props.color || { value: 'lightgray' };
+
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
-
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+    <View style={[styles.container, { backgroundColor: value }]}>
+      <View style={[styles.contentSection]}>
+        <Text style={styles.header}>Hi! pick your favorite color</Text>
+        <View style={styles.spaceX4}>
+          {['green', 'blue', 'purple'].map((c) => {
+            return (
+              <Button
+                title={c}
+                onPress={() => {
+                  db.transact(db.tx.colors[selectId].update({ value: c }));
+                }}
+                key={c}
+              />
+            );
+          })}
+        </View>
+      </View>
+    </View>
   );
 }
 
@@ -65,34 +72,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  spaceY4: {
+    marginVertical: 16,
+  },
+  spaceX4: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginHorizontal: 16,
   },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
+  contentSection: {
+    backgroundColor: 'white',
+    opacity: 0.8,
+    padding: 12,
+    borderRadius: 8,
   },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
-  },
-  title: {
-    textAlign: 'center',
-  },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
   },
 });
+
+export default App;
