@@ -2,7 +2,11 @@ import { init, i, InstaQLEntity } from '@instantdb/react-native';
 import { View, Text, Button, StyleSheet } from 'react-native';
 
 // ID for app: jchat
-const APP_ID = 'c070abbe-96d4-4352-9bf2-b84957f9b948';
+const APP_ID = process.env.EXPO_PUBLIC_APP_ID;
+
+if (!APP_ID) {
+  throw new Error("You need to set an App ID")
+}
 
 // Optional: You can declare a schema!
 const schema = i.schema({
@@ -51,7 +55,7 @@ function Main(props: { color?: Color }) {
       <View style={[styles.contentSection]}>
         <Text style={styles.header}>Hi! pick your favorite color</Text>
         <View style={styles.spaceX4}>
-          {['green', 'blue', 'purple'].map((c) => {
+          {['green', 'blue', 'purple', 'yellow'].map((c) => {
             return (
               <Button
                 title={c}
