@@ -1,3 +1,4 @@
+import '../../global.css';
 import { Stack } from 'expo-router'
 import { db } from '@/utils'
 import { View, ActivityIndicator, StatusBar } from 'react-native'
