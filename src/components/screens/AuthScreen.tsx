@@ -6,13 +6,14 @@ export default function AuthScreen() {
   const [sentEmail, setSentEmail] = useState('')
   const [email, setEmail] = useState('')
   const [code, setCode] = useState('')
-  const { user } = db.useAuth()
 
   if (!sentEmail) {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Let's log you in!</Text>
         <TextInput
+          className="rounded-lg"
+          placeholderTextColor={'black'}
           placeholder="Enter your email"
           value={email}
           onChangeText={setEmail}
@@ -28,6 +29,12 @@ export default function AuthScreen() {
             })
           }}
         />
+        <View className=" mt-4">
+          <Button
+            title="Sign In as Guest"
+            onPress={() => db.auth.signInAsGuest()}
+          />
+        </View>
       </View>
     )
   }
