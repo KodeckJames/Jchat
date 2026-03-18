@@ -6,7 +6,7 @@ export default function App() {
   const {} = db.useAuth()
   return (
     <View>
-      <Text>Yellow</Text>
+      <Text className=' text-xl text-blue-500'>Yellow</Text>
       <Button title="Sign Out" onPress={() => db.auth.signOut()} />
     </View>
   )
