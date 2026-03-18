@@ -1,8 +1,6 @@
 import { init, i, InstaQLEntity } from '@instantdb/react-native';
 import { View, Text, Button, StyleSheet } from 'react-native';
-
-// ID for app: jchat
-const APP_ID = process.env.EXPO_PUBLIC_APP_ID;
+import {APP_ID} from '@/utils'
 
 if (!APP_ID) {
   throw new Error("You need to set an App ID")
