@@ -6,7 +6,7 @@ export default function AppLayout() {
   return (
     <>
       <db.SignedIn>
-        <Stack />
+        <Stack screenOptions={{headerShown:false}} />
       </db.SignedIn>
       <db.SignedOut>
         <Redirect href={'/auth'} />

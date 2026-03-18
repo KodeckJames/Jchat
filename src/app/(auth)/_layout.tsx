@@ -9,7 +9,7 @@ export default function AuthLayout() {
         <Stack />
       </db.SignedOut>
       <db.SignedIn>
-        <Redirect href="/(app)/index" />
+        <Redirect href={'/(app)'}/>
       </db.SignedIn>
     </>
   )

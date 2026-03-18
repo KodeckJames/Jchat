@@ -1,5 +1,5 @@
-import { View, Text } from 'react-native'
 import AuthScreen from '@/components/screens/AuthScreen'
+import { View } from 'react-native'
 
 export default function Auth() {
   return (
