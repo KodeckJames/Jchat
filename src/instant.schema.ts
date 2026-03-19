@@ -19,6 +19,16 @@ const _schema = i.schema({
       imageURL: i.string().optional(),
       type: i.string().optional(),
     }),
+    profiles: i.entity({
+      displayName: i.string(),
+    }),
+    channels: i.entity({
+      name: i.string().indexed(),
+    }),
+    messages: i.entity({
+      content: i.string(),
+      timestamp: i.number().indexed(),
+    }),
     colors: i.entity({
       value: i.string().optional(),
     }),
