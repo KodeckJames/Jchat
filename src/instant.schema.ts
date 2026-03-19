@@ -29,9 +29,6 @@ const _schema = i.schema({
       content: i.string(),
       timestamp: i.number().indexed(),
     }),
-    colors: i.entity({
-      value: i.string().optional(),
-    }),
   },
   links: {
     $streams$files: {
