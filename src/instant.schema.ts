@@ -60,8 +60,54 @@ const _schema = i.schema({
         label: "linkedGuestUsers",
       },
     },
+    userProfile: {
+      forward: {
+        on: "profiles",
+        has: "one",
+        label: "user",
+        onDelete: "cascade",
+      },
+      reverse: {
+        on: "$users",
+        has: "one",
+        label: "profile",
+      },
+    },
+    authorMessages: {
+      forward: {
+        on: "messages",
+        has: "one",
+        label: "author",
+        onDelete: "cascade",
+      },
+      reverse: {
+        on: "profiles",
+        has: "many",
+        label: "messages",
+      },
+    },
+    channelMessages: {
+      forward: {
+        on: "messages",
+        has: "one",
+        label: "channel",
+        onDelete: "cascade",
+      },
+      reverse: {
+        on: "channels",
+        has: "many",
+        label: "messages",
+      },
+    },
   },
-  rooms: {},
+  rooms: {
+     chat: {
+      presence: i.entity({
+        profileId: i.string(),
+        displayName: i.string(),
+      }),
+    }
+  },
 });
 
 // This helps TypeScript display nicer intellisense
