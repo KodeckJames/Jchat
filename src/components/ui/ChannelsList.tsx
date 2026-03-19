@@ -1,8 +1,10 @@
-import { View, Text, ActivityIndicator, Pressable, Alert } from 'react-native'
-import React from 'react'
 import { db } from '@/utils'
+import { useRouter } from 'expo-router'
+import { ActivityIndicator, Pressable, Text, View } from 'react-native'
 
 export default function ChannelsList() {
+  const router = useRouter()
+
   const { isLoading, error, data } = db.useQuery({
     channels: {},
   })
@@ -25,7 +27,10 @@ export default function ChannelsList() {
               key={channel.id}
               className=" p-1 bg-green-400 border rounded-lg"
               onPress={() =>
-                Alert.alert(`Welcome to the ${channel.name} Channel `)
+                router.push({
+                  pathname: '/[channel]',
+                  params: { channel: channel.id },
+                })
               }
             >
               <Text className=" font-semibold text-lg">{channel.name}</Text>

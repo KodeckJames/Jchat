@@ -1,4 +1,4 @@
-import '../../global.css';
+import '../../global.css'
 import { Stack } from 'expo-router'
 import { db } from '@/utils'
 import { View, ActivityIndicator, StatusBar } from 'react-native'
@@ -15,9 +15,11 @@ export default function RootLayout() {
   }
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={{flex:1}}>
-        <Stack screenOptions={{ headerShown: false }} />
-        <StatusBar backgroundColor='orange' animated />
+      <SafeAreaView style={{ flex: 1 }}>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="[channel]" options={{ title: 'Channel' }} />
+        </Stack>
+        <StatusBar backgroundColor="orange" animated />
       </SafeAreaView>
     </SafeAreaProvider>
   )
