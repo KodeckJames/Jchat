@@ -8,8 +8,18 @@ import { AppSchema } from '@/instant.schema'
 interface ChannelScreenProps {
   channel: string
 }
-
 type Message = InstaQLEntity<AppSchema, 'messages'>
+type Author = InstaQLEntity<AppSchema, '$users'>
+interface MessageContainerProps {
+  id: Message['id']
+  content: Message['content']
+  timestamp: Message['timestamp']
+  author?: {
+    id: string
+    displayName: string
+    user?: Author
+  }
+}
 
 export function ChannelScreen({ channel }: ChannelScreenProps) {
   if (!channel) {
@@ -21,7 +31,9 @@ export function ChannelScreen({ channel }: ChannelScreenProps) {
         where: { channel: channel as string },
         order: { timestamp: 'asc' },
       },
-      author: {},
+      author: {
+        user: {},
+      },
     },
   })
 
@@ -37,16 +49,25 @@ export function ChannelScreen({ channel }: ChannelScreenProps) {
     <FlatList
       data={data.messages}
       keyExtractor={({ id }) => id}
-      contentContainerStyle={{ padding: 16, gap:16 }}
+      contentContainerStyle={{ padding: 16, gap: 16 }}
       renderItem={({ item }) => <MessageContainer {...item} />}
     />
   )
 }
 
-const MessageContainer = ({ content, id, timestamp }: Message) => {
+const MessageContainer = ({
+  content,
+  id,
+  timestamp,
+  author,
+}: MessageContainerProps) => {
+  const { id: userId } = db.useUser();
+  const isMe = author?.user?.id === userId;
   return (
-    <View className=" p-4 bg-purple-300 border rounded-lg">
+    <View className={`p-4 border rounded-lg ${isMe ? 'ml-auto bg-purple-600' : ' bg-yellow-500'}`}>
       <Text>{content}</Text>
+      <Text>{author?.displayName}</Text>
+      <Text>{timestamp.toLocaleString()}</Text>
     </View>
   )
 }
