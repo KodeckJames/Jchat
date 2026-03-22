@@ -1,4 +1,4 @@
-import { View, Text, ActivityIndicator, FlatList } from 'react-native'
+import { View, Text, ActivityIndicator, FlatList, TextInput, StyleSheet } from 'react-native'
 import React from 'react'
 import { useLocalSearchParams } from 'expo-router'
 import { db } from '@/utils'
@@ -46,12 +46,24 @@ export function ChannelScreen({ channel }: ChannelScreenProps) {
   }
 
   return (
-    <FlatList
-      data={data.messages}
-      keyExtractor={({ id }) => id}
-      contentContainerStyle={{ padding: 16, gap: 16 }}
-      renderItem={({ item }) => <MessageContainer {...item} />}
-    />
+    <>
+      <FlatList
+        data={data.messages}
+        keyExtractor={({ id }) => id}
+        contentContainerStyle={{ padding: 16, gap: 16 }}
+        renderItem={({ item }) => <MessageContainer {...item} />}
+      />
+      <View>
+        <TextInput
+                  className="rounded-lg"
+                  placeholderTextColor={'black'}
+                  placeholder="Enter your email"
+                  // value={email}
+                  // onChangeText={setEmail}
+                  style={styles.input}
+                />
+      </View>
+    </>
   )
 }
 
@@ -71,3 +83,23 @@ const MessageContainer = ({
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+  },
+  header: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 8,
+    marginVertical: 8,
+  },
+})

@@ -3,6 +3,7 @@ import { Stack } from 'expo-router'
 import { db } from '@/utils'
 import { View, ActivityIndicator, StatusBar } from 'react-native'
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context'
+import { KeyboardProvider } from 'react-native-keyboard-controller'
 
 export default function RootLayout() {
   const { isLoading } = db.useAuth()
@@ -14,13 +15,15 @@ export default function RootLayout() {
     )
   }
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={{ flex: 1 }}>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="[channel]" options={{ title: 'Channel' }} />
-        </Stack>
-        <StatusBar backgroundColor="orange" animated />
-      </SafeAreaView>
-    </SafeAreaProvider>
+    <KeyboardProvider>
+      <SafeAreaProvider>
+        <SafeAreaView style={{ flex: 1 }}>
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="[channel]" options={{ title: 'Channel' }} />
+          </Stack>
+          <StatusBar backgroundColor="orange" animated />
+        </SafeAreaView>
+      </SafeAreaProvider>
+    </KeyboardProvider>
   )
 }
