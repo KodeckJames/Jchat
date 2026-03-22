@@ -1,15 +1,31 @@
-import { View, Text, ActivityIndicator, FlatList, TextInput, StyleSheet } from 'react-native'
-import React from 'react'
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  FlatList,
+  TextInput,
+  StyleSheet,
+  Pressable,
+  Keyboard,
+} from 'react-native'
+import React, { useState } from 'react'
 import { useLocalSearchParams } from 'expo-router'
-import { db } from '@/utils'
-import { InstaQLEntity } from '@instantdb/react-native'
+import { db, useProfile } from '@/utils'
+import { id, InstaQLEntity } from '@instantdb/react-native'
 import { AppSchema } from '@/instant.schema'
+import {
+  KeyboardAvoidingView,
+  KeyboardStickyView,
+} from 'react-native-keyboard-controller'
+import { SymbolView } from 'expo-symbols'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 interface ChannelScreenProps {
   channel: string
 }
 type Message = InstaQLEntity<AppSchema, 'messages'>
 type Author = InstaQLEntity<AppSchema, '$users'>
+
 interface MessageContainerProps {
   id: Message['id']
   content: Message['content']
@@ -22,6 +38,11 @@ interface MessageContainerProps {
 }
 
 export function ChannelScreen({ channel }: ChannelScreenProps) {
+  const { bottom } = useSafeAreaInsets()
+  const [message, setMessage] = useState('')
+  const { id: userId } = db.useUser()
+  const { profile } = useProfile()
+
   if (!channel) {
     return <Text className=" text-red-600">No Channel!!!</Text>
   }
@@ -41,6 +62,20 @@ export function ChannelScreen({ channel }: ChannelScreenProps) {
     return <ActivityIndicator size={'large'} color={'blue'} />
   }
 
+  const handleSendMessage = () => {
+    setMessage('')
+    Keyboard.dismiss()
+    const messageId = id()
+    const messageTx = db.tx.messages[messageId]
+      .create({
+        content: message,
+        timestamp: Date.now(),
+      })
+      .link({ author: profile?.id })
+      .link({ channel: channel })
+    db.transact(messageTx)
+  }
+
   if (error) {
     return <Text>Error: {error.message}</Text>
   }
@@ -53,16 +88,35 @@ export function ChannelScreen({ channel }: ChannelScreenProps) {
         contentContainerStyle={{ padding: 16, gap: 16 }}
         renderItem={({ item }) => <MessageContainer {...item} />}
       />
-      <View>
-        <TextInput
-                  className="rounded-lg"
-                  placeholderTextColor={'black'}
-                  placeholder="Enter your email"
-                  // value={email}
-                  // onChangeText={setEmail}
-                  style={styles.input}
-                />
-      </View>
+      <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={40}>
+        <View className=" flex flex-row items-center px-4 gap-2">
+          <TextInput
+            className="rounded-full p-2 text-black flex-1"
+            placeholderTextColor={'grey'}
+            placeholder="Chat..."
+            keyboardType="default"
+            onSubmitEditing={handleSendMessage}
+            autoFocus
+            multiline
+            value={message}
+            onChangeText={setMessage}
+            style={styles.input}
+          />
+          <Pressable
+            onPress={handleSendMessage}
+            className=" bg-purple-300 rounded-xl p-1"
+          >
+            <SymbolView
+              name={{
+                ios: 'arrow.up',
+                android: 'arrow_upward',
+              }}
+              size={30}
+              tintColor={'blue'}
+            />
+          </Pressable>
+        </View>
+      </KeyboardAvoidingView>
     </>
   )
 }
@@ -73,10 +127,12 @@ const MessageContainer = ({
   timestamp,
   author,
 }: MessageContainerProps) => {
-  const { id: userId } = db.useUser();
-  const isMe = author?.user?.id === userId;
+  const { id: userId } = db.useUser()
+  const isMe = author?.user?.id === userId
   return (
-    <View className={`p-4 border rounded-lg ${isMe ? 'ml-auto bg-purple-600' : ' bg-yellow-500'}`}>
+    <View
+      className={`p-4 border rounded-lg ${isMe ? 'ml-auto bg-purple-600' : ' bg-yellow-500'}`}
+    >
       <Text>{content}</Text>
       <Text>{author?.displayName}</Text>
       <Text>{timestamp.toLocaleString()}</Text>

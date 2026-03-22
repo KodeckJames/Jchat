@@ -16,3 +16,20 @@ if (!APP_ID) {
 
 export const db = init({ appId: APP_ID, schema });
 
+export function useProfile() {
+  const { user, error: userError } = db.useAuth();
+
+  const { data, error } = db.useQuery(user?.id ? {
+    profiles: {
+      $: { where: { "user.id": user.id } },
+    }
+  } : null);
+
+  if (userError) { return { profile: undefined, error: userError }; }
+  if (!user) { return { profile: undefined, error: null }; }
+
+  return {
+    profile: data?.profiles?.[0],
+    error,
+  };
+}
